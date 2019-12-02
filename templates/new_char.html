@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <h1>New character creation</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.charname.label }}<br>
+            {{ form.charname(size=120) }}
+            {% for error in form.charname.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.charrace.label }}<br>
+            {{ form.charrace }}
+            {% for error in form.charrace.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.charlevel.label }}<br>
+            {{ form.charlevel(size=2) }}
+            {% for error in form.charlevel.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.charclass.label }}<br>
+            {{ form.charclass }}
+            {% for error in form.charclass.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.charalign.label }}<br>
+            {{ form.charalign }}
+            {% for error in form.charalign.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.charbkgrd.label }}<br>
+            {{ form.charbkgrd }}
+            {% for error in form.charbkgrd.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
