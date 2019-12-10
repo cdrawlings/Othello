@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 import pymysql
-import os
+
 from flask_mail import Mail, Message
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, IntegerField
@@ -27,7 +27,6 @@ app.config['TESTING'] = False
 db = SQLAlchemy(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
-
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
@@ -44,7 +43,6 @@ class Char(db.Model):
     wisdom = db.Column(db.Integer, default=10)
     intelligence = db.Column(db.Integer, default=10)
     charisma = db.Column(db.Integer, default=10)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
         return '<Char {}>'.format(self.charname)
@@ -54,11 +52,21 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(60), unique=True, nullable=False)
-    password = db.Column(db.String(24), nullable=False)
-    char = db.relationship('Char', backref='player', lazy='dynamic')
+    password = db.Column(db.String(60), unique=True, nullable=False)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+
+class Profile(db.Model):
+    __tablename__ = 'profile'
+    id = db.Column(db.Integer, primary_key=True)
+    first = db.Column(db.String(60), unique=True, nullable=False)
+    last = db.Column(db.String(60), unique=True, nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+
+    def __repr__(self):
+        return '<Profile {}>'.format(self.username)
 
 
 class NewChar(FlaskForm):
@@ -99,7 +107,6 @@ class NewUser(FlaskForm):
     submit = SubmitField('Submit')
 
 
-
 # New user form
 class ManualStats(FlaskForm):
     strength = IntegerField('Strength', validators=[DataRequired()])
@@ -111,7 +118,6 @@ class ManualStats(FlaskForm):
     submit = SubmitField('Submit')
 
 
-
 @app.route('/')
 def index():
     msg = Message("Hello", sender='dev@rawlings.site', recipients=['c.d.rawlings@gmail.com'])
@@ -120,10 +126,9 @@ def index():
     return render_template('index.html')
 
 
-
 @app.route('/login')
 def login():
-    return render_template('login')
+    return render_template('login.html')
 
 
 @app.route('/new_user')
@@ -137,10 +142,12 @@ def newchar():
     form = NewChar()
     return render_template('new_char.html', title='New charatcter', form=form)
 
+
 @app.route('/manual_enter')
 def manual():
     form = ManualStats()
     return render_template('manual.html', title='Manually enter stats', form=form)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
