@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <h1>New character creation</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.strength.label }}<br>
+            {{ form.strength }}
+            {% for error in form.strength.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.constition.label }}<br>
+            {{ form.constition }}
+            {% for error in form.constition.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.dexterity.label }}<br>
+            {{ form.dexterity }}
+            {% for error in form.dexterity.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.intelligence.label }}<br>
+            {{ form.intelligence }}
+            {% for error in form.intelligence.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.wisdom.label }}<br>
+            {{ form.wisdom }}
+            {% for error in form.wisdom.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.charisma.label }}<br>
+            {{ form.charisma }}
+            {% for error in form.charisma.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

@@ -3,10 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 import pymysql
-
+import os
 from flask_mail import Mail, Message
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, IntegerField
+from wtforms import StringField, SubmitField, SelectField, IntegerField, BooleanField
 from wtforms.validators import DataRequired
 app = Flask(__name__)
 
@@ -27,6 +27,7 @@ app.config['TESTING'] = False
 db = SQLAlchemy(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
+
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
@@ -43,6 +44,7 @@ class Char(db.Model):
     wisdom = db.Column(db.Integer, default=10)
     intelligence = db.Column(db.Integer, default=10)
     charisma = db.Column(db.Integer, default=10)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
         return '<Char {}>'.format(self.charname)
@@ -52,21 +54,11 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(60), unique=True, nullable=False)
-    password = db.Column(db.String(60), unique=True, nullable=False)
+    password = db.Column(db.String(24), nullable=False)
+    char = db.relationship('Char', backref='player', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
-
-
-class Profile(db.Model):
-    __tablename__ = 'profile'
-    id = db.Column(db.Integer, primary_key=True)
-    first = db.Column(db.String(60), unique=True, nullable=False)
-    last = db.Column(db.String(60), unique=True, nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-
-    def __repr__(self):
-        return '<Profile {}>'.format(self.username)
 
 
 class NewChar(FlaskForm):
@@ -99,13 +91,23 @@ class NewChar(FlaskForm):
     submit = SubmitField('Submit')
 
 
-# New user form
-class NewUser(FlaskForm):
+# Registerr form
+class Register(FlaskForm):
+    username = StringField('User name', validators=[DataRequired()])
+    password = StringField('Password', validators=[DataRequired()])
+    password2 = StringField('Password 2', validators=[DataRequired()])
     firstname = StringField('First name', validators=[DataRequired()])
     lastname = StringField('Last name', validators=[DataRequired()])
-    useremail = StringField('Email', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+
+# Log in form
+class LogIn(FlaskForm):
+    password = StringField('Password', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired()])
+    remember_me = BooleanField('Remember me', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 # New user form
 class ManualStats(FlaskForm):
@@ -118,6 +120,7 @@ class ManualStats(FlaskForm):
     submit = SubmitField('Submit')
 
 
+
 @app.route('/')
 def index():
     msg = Message("Hello", sender='dev@rawlings.site', recipients=['c.d.rawlings@gmail.com'])
@@ -126,9 +129,11 @@ def index():
     return render_template('index.html')
 
 
+
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    form = LogIn()
+    return render_template('login.html', title='Log in', form=form)
 
 
 @app.route('/new_user')
@@ -137,17 +142,22 @@ def newuser():
     return render_template('user.html', title='New user', form=form)
 
 
+
+@app.route('/register')
+def register():
+    form = Register()
+    return render_template('register.html', title='New user', form=form)
+
+
 @app.route('/new_character')
 def newchar():
     form = NewChar()
     return render_template('new_char.html', title='New charatcter', form=form)
 
-
 @app.route('/manual_enter')
 def manual():
     form = ManualStats()
     return render_template('manual.html', title='Manually enter stats', form=form)
-
 
 @app.errorhandler(404)
 def page_not_found(e):
