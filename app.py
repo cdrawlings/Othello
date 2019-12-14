@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'hard to guess string'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://rawlings:1234@localhost:8889/char_user'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://rawlings:1234@localhost:8889/dnd_char'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'smtp.fatcow.com'
@@ -54,6 +54,8 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(60), unique=True, nullable=False)
+    first = db.Column(db.String(60), nullable=False)
+    last = db.Column(db.String(60),  nullable=False)
     password = db.Column(db.String(24), nullable=False)
     char = db.relationship('Char', backref='player', lazy='dynamic')
 
@@ -128,6 +130,10 @@ def index():
     mail.send(msg)
     return render_template('index.html')
 
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html', title='Dashboard')
 
 
 @app.route('/login')
