@@ -2,10 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from flask_login import LoginManager, UserMixin, login_required, current_user, login_user
+from flask_login import LoginManager
 import pymysql
-import os
-from flask_mail import Mail, Message
+from flask_mail import Mail
 
 app = Flask(__name__)
 
